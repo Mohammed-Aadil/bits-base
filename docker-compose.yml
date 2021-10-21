@@ -1,0 +1,42 @@
+version: '2'
+services:
+    nginx:
+      build: ./nginx-server
+      ports:
+        - 80:80
+      networks:
+        - todo-net
+    auth-service:
+      build: ./bits-auth
+      ports:
+        - 5001:5001
+      depends_on:
+        - mongo
+      networks:
+        - todo-net
+    todo-service:
+      build: ./bits-todo
+      ports:
+        - 5000:5000
+      depends_on:
+        - mongo
+      networks:
+        - todo-net
+    react-ui:
+      build: ./bits-react-ui
+      ports:
+        - 3000:3000
+      depends_on:
+        - auth-service
+        - todo-service
+      networks:
+        - todo-net
+    mongo:
+        image: mongo
+        ports: 
+          - 27018:27017
+        networks:
+        - todo-net
+networks:
+  todo-net:
+    driver: 'bridge'
